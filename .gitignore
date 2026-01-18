@@ -1,0 +1,56 @@
+# Unreal Engine 5.x Gitignore
+# Standard UE gitignore to keep the repository clean
+
+# Built data
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# Project files
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+*.DS_Store
+
+# Plugins
+Plugins/*/Binaries/
+Plugins/*/Intermediate/
+
+# User-specific
+.vs/
+.idea/
+.vscode/
+
+# Build artifacts
+obj/
+*.pdb
+*.obj
+*.exe
+*.dll
+*.lib
+
+# Specific to Rider/IDE
+.run/
+.idea/
+
+# Autosaves
+Saved/Autosaves/
+
+# Logs
+Saved/Logs/
+
+# Crash Reports
+Saved/Crashes/
+
+# Compiled assembly files
+*.dll
+*.pdb
+
+# Local Config
+Config/DefaultEditorPerProjectUserSettings.ini
+Config/DefaultEditorSettings.ini

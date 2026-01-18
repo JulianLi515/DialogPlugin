@@ -1,0 +1,12 @@
+# Unreal Engine Plugin Gitignore
+# Specific for sharing just the plugin folder
+
+Binaries/
+Intermediate/
+DerivedDataCache/
+Build/
+*.pdb
+*.obj
+*.exe
+*.dll
+*.lib
