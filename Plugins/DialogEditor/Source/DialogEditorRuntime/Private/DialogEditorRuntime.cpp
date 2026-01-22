@@ -2,7 +2,7 @@
 
 #include "DialogEditorRuntime.h"
 
-#define LOCTEXT_NAMESPACE "FDialogEditorRuntimeModule"
+#define LOCTEXT_NAMESPACE "DialogEditorRuntimeModule"
 
 void FDialogEditorRuntimeModule::StartupModule()
 {

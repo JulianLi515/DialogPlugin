@@ -1,0 +1,25 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "WorkflowOrientedApp/WorkflowCentricApplication.h"
+
+class FDialogAssetEditorApp : public FWorkflowCentricApplication, public FEditorUndoClient, public FNotifyHook
+{
+public:
+	static const FName DefaultMode;
+	virtual void RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManager) override;
+	void InitEditor(const EToolkitMode::Type mode, const TSharedPtr< class IToolkitHost >& InitToolkitHost, UObject* ObjectToEdit);
+	class UDialogAsset* GetWorkingDialogAsset() const {return WorkingDialogAsset;}
+public: //FAssetEditorToolkit interface
+	virtual FName GetToolkitFName() const override {return FName("DialogAssetEditor");}
+	virtual FText GetBaseToolkitName() const override {return NSLOCTEXT("DialogEditorModule", "DialogAssetEditorApp", "Dialog Asset Editor");}
+	virtual FString GetWorldCentricTabPrefix() const override {return TEXT("DialogAssetEditor");}
+	virtual FLinearColor GetWorldCentricTabColorScale() const override {return FLinearColor::Black;}
+	virtual FString GetDocumentationLink() const override {return TEXT("Not Available");}
+	virtual void OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit) override {}
+	virtual void OnToolkitHostingFinished(const TSharedRef<IToolkit>& Toolkit) override {}
+	
+private:
+	class UDialogAsset* WorkingDialogAsset = nullptr;
+	
+};

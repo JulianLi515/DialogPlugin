@@ -25,7 +25,7 @@ public class DialogEditor : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
+				"Core", "UnrealEd",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -40,7 +40,8 @@ public class DialogEditor : ModuleRules
 				"SlateCore",
 				"DialogEditorRuntime",
 				"AssetTools",
-				"UnrealEd"
+				"UnrealEd",
+				"PropertyEditor"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
