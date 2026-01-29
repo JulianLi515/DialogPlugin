@@ -2,6 +2,8 @@
 
 #include "DialogAsset.h"
 #include "DialogAssetAppMode.h"
+#include "DialogGraphSchema.h"
+#include "Kismet2/BlueprintEditorUtils.h"
 
 const FName FDialogAssetEditorApp::DefaultMode("DialogAssetAppMode");
 
@@ -16,6 +18,12 @@ void FDialogAssetEditorApp::InitEditor(const EToolkitMode::Type mode,
 	if (ObjectToEdit)
 	{
 		WorkingDialogAsset = Cast<UDialogAsset>(ObjectToEdit);
+		WorkingDialogGraph = FBlueprintEditorUtils::CreateNewGraph(
+			WorkingDialogAsset,
+			NAME_None,
+			UEdGraph::StaticClass(),
+			UDialogGraphSchema::StaticClass()
+			);
 	}
 	TArray<UObject*> ObjectsToEdit;
 	ObjectsToEdit.Add(ObjectToEdit);

@@ -1,12 +1,14 @@
 #include "DialogAssetAppMode.h"
 
-#include "DialogAssetPrimaryTabFactory.h"
+#include "DialogAssetPropertiesTabFactory.h"
+#include "FDialogAssetBPEditorTabFactory.h"
 #include "FDialogAssetEditorApp.h"
 
 FDialogAssetAppMode::FDialogAssetAppMode(TSharedPtr<class FDialogAssetEditorApp> InEditorApp)
 	:FApplicationMode(FDialogAssetEditorApp::DefaultMode), EditorApp(InEditorApp)
 {
-	AllowedTabs.RegisterFactory(MakeShareable(new FDialogAssetPrimaryTabFactory(InEditorApp)));\
+	AllowedTabs.RegisterFactory(MakeShareable(new FDialogAssetPropertiesTabFactory(InEditorApp)));
+	AllowedTabs.RegisterFactory(MakeShareable(new FDialogAssetBPEditorTabFactory(InEditorApp)));
 	TabLayout = FTabManager::NewLayout("DialogAssetAppMode_Layout_v1.1")
 	->AddArea
 		(
@@ -14,8 +16,18 @@ FDialogAssetAppMode::FDialogAssetAppMode(TSharedPtr<class FDialogAssetEditorApp>
 			->SetOrientation(Orient_Vertical)
 			->Split
 			(
-				FTabManager::NewStack()
-				->AddTab(FDialogAssetPrimaryTabFactory::TabID, ETabState::OpenedTab)
+				FTabManager::NewSplitter()
+				->SetOrientation(Orient_Horizontal)
+				->Split(
+					FTabManager::NewStack()
+						->SetSizeCoefficient(0.75f)
+						->AddTab(FDialogAssetBPEditorTabFactory::TabID, ETabState::OpenedTab)
+					)
+				->Split(
+					FTabManager::NewStack()
+						->SetSizeCoefficient(0.25f)
+						->AddTab(FDialogAssetPropertiesTabFactory::TabID, ETabState::OpenedTab)
+					)
 			)
 		);
 	

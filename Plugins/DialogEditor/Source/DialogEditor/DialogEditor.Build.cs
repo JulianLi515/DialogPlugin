@@ -41,7 +41,10 @@ public class DialogEditor : ModuleRules
 				"DialogEditorRuntime",
 				"AssetTools",
 				"UnrealEd",
-				"PropertyEditor"
+				"PropertyEditor",
+				"Projects",
+				"ToolMenus",
+				"GraphEditor"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

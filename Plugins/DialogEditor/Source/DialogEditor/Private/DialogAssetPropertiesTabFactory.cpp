@@ -1,21 +1,21 @@
-#include "DialogAssetPrimaryTabFactory.h"
+#include "DialogAssetPropertiesTabFactory.h"
 #include "FDialogAssetEditorApp.h"
 #include "DialogAsset.h"
 
 #define LOCTEXT_NAMESPACE "DialogEditorModule"
 
-const FName FDialogAssetPrimaryTabFactory::TabID("DialogAssetPrimaryTab");
+const FName FDialogAssetPropertiesTabFactory::TabID("DialogAssetPropertiesTab");
 
-FDialogAssetPrimaryTabFactory::FDialogAssetPrimaryTabFactory(TSharedPtr<class FDialogAssetEditorApp> InEditorApp)
+FDialogAssetPropertiesTabFactory::FDialogAssetPropertiesTabFactory(TSharedPtr<class FDialogAssetEditorApp> InEditorApp)
 	: FWorkflowTabFactory(TabID, InEditorApp)
 {
 	EditorApp = InEditorApp;
-	TabLabel = FText::FromString("Primary");
-	ViewMenuDescription = FText::FromString("Primary tab for Dialog Asset Editor");
-	ViewMenuTooltip = FText::FromString("Primary tab for Dialog Asset Editor");
+	TabLabel = FText::FromString("Properties");
+	ViewMenuDescription = FText::FromString("Properties tab for Dialog Asset Editor");
+	ViewMenuTooltip = FText::FromString("Displays customisable properties of the Dialog Asset");
 }
 
-TSharedRef<SWidget> FDialogAssetPrimaryTabFactory::CreateTabBody(const FWorkflowTabSpawnInfo& Info) const
+TSharedRef<SWidget> FDialogAssetPropertiesTabFactory::CreateTabBody(const FWorkflowTabSpawnInfo& Info) const
 {
 	TSharedPtr<FDialogAssetEditorApp> App = EditorApp.Pin();
 	if (!App.IsValid()) return SNullWidget::NullWidget;
@@ -47,9 +47,9 @@ TSharedRef<SWidget> FDialogAssetPrimaryTabFactory::CreateTabBody(const FWorkflow
 		];
 }
 
-FText FDialogAssetPrimaryTabFactory::GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const
+FText FDialogAssetPropertiesTabFactory::GetTabToolTipText(const FWorkflowTabSpawnInfo& Info) const
 {
-	return LOCTEXT("DialogAssetPrimaryTabToolTip", "Primary tab for Dialog Asset Editor");
+	return LOCTEXT("DialogAssetPropertiesTabToolTip", "Properties tab for Dialog Asset Editor");
 }
 
 #undef LOCTEXT_NAMESPACE
