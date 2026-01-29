@@ -6,6 +6,7 @@
 #include "UObject/Object.h"
 #include "DialogAsset.generated.h"
 
+class UDialogGraphRuntime;
 /**
  * 
  */
@@ -23,4 +24,7 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	bool TestBoolData = true;
+	
+	UPROPERTY()
+	UDialogGraphRuntime* DialogGraph = nullptr;
 };

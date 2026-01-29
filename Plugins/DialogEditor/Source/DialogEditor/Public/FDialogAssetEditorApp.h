@@ -19,9 +19,14 @@ public: //FAssetEditorToolkit interface
 	virtual FString GetDocumentationLink() const override {return TEXT("Not Available");}
 	virtual void OnToolkitHostingStarted(const TSharedRef<IToolkit>& Toolkit) override {}
 	virtual void OnToolkitHostingFinished(const TSharedRef<IToolkit>& Toolkit) override {}
+	virtual void OnClose() override;
+	void OnGraphChanged(const FEdGraphEditAction& EditAction);
 	
+protected:
+	void UpdateWorkingAssetFromGraph();
+	void UpdateEditorGraphFromWorkingAsset();
 private:
 	class UDialogAsset* WorkingDialogAsset = nullptr;
 	class UEdGraph* WorkingDialogGraph = nullptr;
-	
+	FDelegateHandle GraphChangedDelegateHandle;
 };

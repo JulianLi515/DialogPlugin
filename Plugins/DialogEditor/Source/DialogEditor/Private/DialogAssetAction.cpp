@@ -47,3 +47,4 @@ uint32 FDialogAssetAction::GetCategories()
 	return AssetCategory;
 }
 
+#undef LOCTEXT_NAMESPACE

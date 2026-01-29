@@ -39,9 +39,8 @@ void UDialogGraphNode::GetNodeContextMenuActions(class UToolMenu* Menu,
 			FUIAction(FExecuteAction::CreateLambda(
 				[MutableThis]()
 					{
-						MutableThis->CreatePin(
+						MutableThis->CreateCustomPin(
 							EGPD_Output,
-							TEXT("Outputs"),
 							TEXT("SomeOutput"));
 						MutableThis->GetGraph()->NotifyGraphChanged();
 						MutableThis->GetGraph()->Modify();
