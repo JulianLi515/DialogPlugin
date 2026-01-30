@@ -1,9 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "DialogEditor.h"
-#include "DialogAssetAction.h"
+#include "DialogAsset/DialogAssetAction.h"
 #include "IAssetTools.h"
-#include "SDialogGraphPin.h"
+#include "DialogGraph/SDialogGraphPin.h"
 #include "Interfaces/IPluginManager.h"
 #include "Styling/SlateStyleRegistry.h"
 
@@ -14,6 +14,9 @@ const FName FDialogEditorModule::DialogEditorStyleSetName("DialogEditorStyle");
 void FDialogEditorModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
+	
+	// 1.  We need to register our dialog asset type and provide an AssetAction for it
+	//		- The asset action will define how the asset editor is displayed when asset is opened
 	IAssetTools& AssetTools = IAssetTools::Get();
 	EAssetTypeCategories::Type AssetType = AssetTools.RegisterAdvancedAssetCategory(
 		FName(TEXT("DialogAssets")),
@@ -22,6 +25,7 @@ void FDialogEditorModule::StartupModule()
 	TSharedPtr<FDialogAssetAction> DialogAssetAction = MakeShareable(new FDialogAssetAction(AssetType));
 	AssetTools.RegisterAssetTypeActions(DialogAssetAction.ToSharedRef());
 	
+	// 2. Register Image brush needed in style set
 	StyleSet = MakeShareable(new FSlateStyleSet(DialogEditorStyleSetName));
 	TSharedPtr<IPlugin> Plugin = IPluginManager::Get().FindPlugin("DialogEditor");
 	FString ContentDir = Plugin->GetContentDir();
@@ -41,6 +45,7 @@ void FDialogEditorModule::StartupModule()
 	StyleSet->Set("DialogEditor.DeleteNodeIcon", DeleteNodeIconBrush);
 	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet);
 	
+	// 3. Register pin factory for dialog graph
 	PinFactory = MakeShareable(new FDialogGraphPinFactory());
 	FEdGraphUtilities::RegisterVisualPinFactory(PinFactory);
 }

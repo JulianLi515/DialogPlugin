@@ -1,5 +1,5 @@
-#include "DialogAssetPropertiesTabFactory.h"
-#include "FDialogAssetEditorApp.h"
+#include "DialogAsset/DialogAssetPropertiesTabFactory.h"
+#include "DialogEditor/FDialogAssetEditorApp.h"
 #include "DialogAsset.h"
 
 #define LOCTEXT_NAMESPACE "DialogEditorModule"
@@ -36,6 +36,10 @@ TSharedRef<SWidget> FDialogAssetPropertiesTabFactory::CreateTabBody(const FWorkf
 	
 	TSharedPtr<IDetailsView> DetailsView = PropertyModule.CreateDetailView(DetailsViewArgs);
 	DetailsView->SetObject(App->GetWorkingDialogAsset());
+	
+	TSharedPtr<IDetailsView> SelectedNodeDetailsView = PropertyModule.CreateDetailView(DetailsViewArgs);
+	SelectedNodeDetailsView->SetObject(nullptr);
+	App->SetSelectedNodeDetailsView(SelectedNodeDetailsView);
 		
 	
 	return SNew(SVerticalBox)
@@ -44,6 +48,12 @@ TSharedRef<SWidget> FDialogAssetPropertiesTabFactory::CreateTabBody(const FWorkf
 		.HAlign(HAlign_Fill)
 		[
 			DetailsView.ToSharedRef()
+		]
+		+ SVerticalBox::Slot()
+		.FillHeight(1.0f)
+		.HAlign(HAlign_Fill)
+		[
+			SelectedNodeDetailsView.ToSharedRef()
 		];
 }
 
@@ -53,3 +63,4 @@ FText FDialogAssetPropertiesTabFactory::GetTabToolTipText(const FWorkflowTabSpaw
 }
 
 #undef LOCTEXT_NAMESPACE
+

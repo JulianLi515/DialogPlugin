@@ -1,8 +1,8 @@
-#include "DialogAssetAppMode.h"
+#include "DialogEditor/DialogAssetAppMode.h"
 
-#include "DialogAssetPropertiesTabFactory.h"
-#include "FDialogAssetBPEditorTabFactory.h"
-#include "FDialogAssetEditorApp.h"
+#include "DialogAsset/DialogAssetPropertiesTabFactory.h"
+#include "DialogEditor/FDialogAssetBPEditorTabFactory.h"
+#include "DialogEditor/FDialogAssetEditorApp.h"
 
 FDialogAssetAppMode::FDialogAssetAppMode(TSharedPtr<class FDialogAssetEditorApp> InEditorApp)
 	:FApplicationMode(FDialogAssetEditorApp::DefaultMode), EditorApp(InEditorApp)
@@ -53,3 +53,4 @@ void FDialogAssetAppMode::PostActivateMode()
 {
 	FApplicationMode::PostActivateMode();
 }
+

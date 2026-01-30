@@ -2,3 +2,14 @@
 
 
 #include "DialogAsset.h"
+
+#include "UObject/ObjectSaveContext.h"
+
+void UDialogAsset::PreSave(FObjectPreSaveContext SaveContext)
+{
+	if (PreSaveCallback)
+	{
+		PreSaveCallback();
+	}
+	Super::PreSave(SaveContext);
+}

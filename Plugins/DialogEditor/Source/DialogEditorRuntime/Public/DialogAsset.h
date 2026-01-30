@@ -16,15 +16,16 @@ class DIALOGEDITORRUNTIME_API UDialogAsset : public UObject
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere)
-	FString TestStringData = "Hello";
+	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
+	void SetPreSaveCallback(std::function<void()> InCallback) { PreSaveCallback = InCallback; }
 	
 	UPROPERTY(EditAnywhere)
-	int32 TestIntData = 42;
-	
-	UPROPERTY(EditAnywhere)
-	bool TestBoolData = true;
+	FText DialogName = FText::FromString("Enter Dialog Name Here");
 	
 	UPROPERTY()
 	UDialogGraphRuntime* DialogGraph = nullptr;
+	
+	
+private:
+	std::function<void()> PreSaveCallback;
 };

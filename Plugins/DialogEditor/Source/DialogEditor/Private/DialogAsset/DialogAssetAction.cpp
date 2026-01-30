@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "DialogAssetAction.h"
+#include "DialogAsset/DialogAssetAction.h"
 #include "DialogAsset.h"
-#include "FDialogAssetEditorApp.h"
+#include "DialogEditor/FDialogAssetEditorApp.h"
 #define LOCTEXT_NAMESPACE "DialogAssetAction"
 
 FDialogAssetAction::FDialogAssetAction(EAssetTypeCategories::Type InAssetCategory)
@@ -30,6 +30,7 @@ UClass* FDialogAssetAction::GetSupportedClass() const
 void FDialogAssetAction::OpenAssetEditor(const TArray<UObject*>& InObjects,
 	TSharedPtr<class IToolkitHost> EditWithinLevelEditor)
 {
+	// open an editor app
 	EToolkitMode::Type Mode = EditWithinLevelEditor.IsValid() ? EToolkitMode::WorldCentric : EToolkitMode::Standalone;
 	for (auto Obj : InObjects)
 	{
@@ -48,3 +49,4 @@ uint32 FDialogAssetAction::GetCategories()
 }
 
 #undef LOCTEXT_NAMESPACE
+

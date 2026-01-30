@@ -1,4 +1,4 @@
-#include "SDialogGraphPin.h"
+#include "DialogGraph/SDialogGraphPin.h"
 
 const FName SDialogGraphPin::DialogGraphPinSubCategory("DialogGraphPin");
 
@@ -11,3 +11,4 @@ FSlateColor SDialogGraphPin::GetPinColor() const
 {
 	return FSlateColor(FLinearColor(0.2f, 1.f, 0.2f));
 }
+
