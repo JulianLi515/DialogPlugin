@@ -13,4 +13,10 @@ UCLASS()
 class DIALOGEDITOR_API UDialogGraphStartNode : public UDialogGraphNodeBase
 {
 	GENERATED_BODY()
+public:
+	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
+	virtual FLinearColor GetNodeTitleColor() const override;
+	virtual bool CanUserDeleteNode() const override;
+	
+	virtual UEdGraphPin* CreateDialogPin(EEdGraphPinDirection InDirection, FName InName) override;
 };

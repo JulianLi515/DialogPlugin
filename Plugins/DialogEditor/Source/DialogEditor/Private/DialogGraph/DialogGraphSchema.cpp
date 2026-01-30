@@ -5,6 +5,7 @@
 
 #include "DialogNode/DialogGraphNode.h"
 #include "DialogNodeInfo.h"
+#include "DialogNode/DialogGraphStartNode.h"
 
 
 UEdGraphNode* FNewNodeAction::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location,
@@ -31,6 +32,20 @@ UEdGraphNode* FNewNodeAction::PerformAction(class UEdGraph* ParentGraph, UEdGrap
 	
 }
 
+UEdGraphNode* FNewStartNodeAction::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin,
+	const FVector2D Location, bool bSelectNewNode)
+{
+	UDialogGraphStartNode* ResultNode = NewObject<UDialogGraphStartNode>(ParentGraph);
+	ResultNode->CreateNewGuid();
+	ResultNode->NodePosX = Location.X;
+	ResultNode->NodePosY = Location.Y;
+	FString DefaultResponse = FString("Continue");
+	ResultNode->CreateDialogPin(EGPD_Output, FName("Start"));
+	ParentGraph->AddNode(ResultNode, true, true);
+	
+	return ResultNode;
+}
+
 void UDialogGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const
 {
 	TSharedPtr<FNewNodeAction> NewNodeAction = MakeShareable(new FNewNodeAction(
@@ -38,7 +53,13 @@ void UDialogGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& Contex
 		FText::FromString("New node"),
 		FText::FromString("Makes a new node"),
 		0));
+	TSharedPtr<FNewStartNodeAction> NewStartNodeAction = MakeShareable(new FNewStartNodeAction(
+		FText::FromString("Start Node"),
+		FText::FromString("New Start Node"),
+		FText::FromString("Makes a new Start Node"),
+		0));
 	ContextMenuBuilder.AddAction(NewNodeAction);
+	ContextMenuBuilder.AddAction(NewStartNodeAction);
 }
 
 const FPinConnectionResponse UDialogGraphSchema::CanCreateConnection(const UEdGraphPin* A, const UEdGraphPin* B) const
@@ -53,5 +74,17 @@ const FPinConnectionResponse UDialogGraphSchema::CanCreateConnection(const UEdGr
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, "Pin already connected");
 	}
 	return FPinConnectionResponse(CONNECT_RESPONSE_BREAK_OTHERS_AB, "");
+}
+
+void UDialogGraphSchema::CreateDefaultNodesForGraph(UEdGraph& Graph) const
+{
+	Super::CreateDefaultNodesForGraph(Graph);
+	UDialogGraphStartNode* StartNode = NewObject<UDialogGraphStartNode>(&Graph);
+	StartNode->CreateNewGuid();
+	StartNode->NodePosX = 0;
+	StartNode->NodePosY = 0;
+	StartNode->CreateDialogPin(EGPD_Output, TEXT("Start"));
+	Graph.AddNode(StartNode, true, true);
+	Graph.Modify();
 }
 

@@ -8,7 +8,10 @@
 #include "DialogGraphRuntime.h"
 #include "DialogGraph/DialogGraphSchema.h"
 #include "DialogNodeInfo.h"
+#include "DialogNode/DialogGraphStartNode.h"
 #include "Kismet2/BlueprintEditorUtils.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogDialogAssetEditorAppSub, Log, All);
 
 const FName FDialogAssetEditorApp::DefaultMode("DialogAssetAppMode");
 
@@ -108,10 +111,9 @@ void FDialogAssetEditorApp::UpdateWorkingAssetFromGraph()
 	for (UEdGraphNode* GraphNode : WorkingDialogGraph->Nodes)
 	{
 		UDialogGraphNodeRuntime* RuntimeNode = NewObject<UDialogGraphNodeRuntime>(RuntimeGraph);
-		UDialogGraphNode* DialogNode = Cast<UDialogGraphNode>(GraphNode);
-		RuntimeNode->NodeInfo = DialogNode->GetNodeInfo();
 		// record position
 		RuntimeNode->Position = FVector2D(GraphNode->NodePosX, GraphNode->NodePosY);
+		
 		// iterate through all pins in this node and create corresponding runtime pins
 		for (UEdGraphPin* GraphPin : GraphNode->Pins)
 		{
@@ -137,6 +139,18 @@ void FDialogAssetEditorApp::UpdateWorkingAssetFromGraph()
 				RuntimeNode->OutputPins.Add(RuntimePin);
 			}
 		}
+		if (GraphNode->IsA<UDialogGraphNode>())
+		{
+			UDialogGraphNode* DialogNode = Cast<UDialogGraphNode>(GraphNode);
+			RuntimeNode->NodeInfo = DialogNode->GetNodeInfo();
+			RuntimeNode->NodeType = EDialogNodeType::Dialog;
+			
+		}else if (GraphNode->IsA<UDialogGraphStartNode>())
+		{
+			UDialogGraphStartNode* DialogStartNode = Cast<UDialogGraphStartNode>(GraphNode);
+			RuntimeNode->NodeInfo = DialogStartNode->GetNodeInfo();
+			RuntimeNode->NodeType = EDialogNodeType::Start;
+		}
 		RuntimeGraph->DialogNodes.Add(RuntimeNode);
 	}
 	
@@ -152,24 +166,38 @@ void FDialogAssetEditorApp::UpdateWorkingAssetFromGraph()
 
 void FDialogAssetEditorApp::UpdateEditorGraphFromWorkingAsset()
 {
-	if (!WorkingDialogAsset->DialogGraph) return;
+	if (!WorkingDialogAsset->DialogGraph)
+	{
+		WorkingDialogGraph->GetSchema()->CreateDefaultNodesForGraph(*WorkingDialogGraph);
+		return;
+	}
 	TArray<std::pair<FGuid, FGuid>> Connections;
 	TMap<FGuid, UEdGraphPin*> IdToPinMap;
 	for (UDialogGraphNodeRuntime* RuntimeNode : WorkingDialogAsset->DialogGraph->DialogNodes)
 	{
-		UDialogGraphNode* GraphNode = NewObject<UDialogGraphNode>(WorkingDialogGraph);
+		UDialogGraphNodeBase* GraphNode = nullptr;
+		if (RuntimeNode->NodeType == EDialogNodeType::Start)
+		{
+			GraphNode = NewObject<UDialogGraphStartNode>(WorkingDialogGraph);
+		}else if (RuntimeNode->NodeType == EDialogNodeType::Dialog)
+		{
+			GraphNode = NewObject<UDialogGraphNode>(WorkingDialogGraph);
+		}else
+		{
+			UE_LOG(LogDialogAssetEditorAppSub, Error, TEXT("Unknown node type %d"), RuntimeNode->NodeType);
+			continue;
+		}
 		GraphNode->CreateNewGuid();
 		GraphNode->NodePosX = RuntimeNode->Position.X;
 		GraphNode->NodePosY = RuntimeNode->Position.Y;
 		if (UDialogNodeInfo* NodeInfo = RuntimeNode->NodeInfo)
 		{
 			GraphNode->SetNodeInfo(DuplicateObject(NodeInfo, RuntimeNode));
-		}else
+		}else if (RuntimeNode->NodeType != EDialogNodeType::Start)
 		{
 			GraphNode->SetNodeInfo(NewObject<UDialogNodeInfo>(RuntimeNode));
 		}
-		{
-			UDialogGraphPinRuntime* InputPin = RuntimeNode->InputPin;
+		if (UDialogGraphPinRuntime* InputPin = RuntimeNode->InputPin){
 			UEdGraphPin* GraphPin = GraphNode->CreateDialogPin(EGPD_Input, InputPin->PinName);
 			GraphPin->PinId = InputPin->PinId;
 			IdToPinMap.Add(InputPin->PinId, GraphPin);

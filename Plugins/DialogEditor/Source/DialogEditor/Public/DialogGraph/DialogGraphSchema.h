@@ -21,6 +21,19 @@ public:
 	virtual UEdGraphNode* PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode = true) override;
 };
 
+USTRUCT()
+struct FNewStartNodeAction :public FEdGraphSchemaAction
+{
+	GENERATED_BODY()
+public:
+	FNewStartNodeAction() {};
+	FNewStartNodeAction(FText InNodeCategory, FText InMenuDesc, FText InToolTip, const int32 InGrouping)
+		: FEdGraphSchemaAction(InNodeCategory, InMenuDesc, InToolTip, InGrouping)	
+	{}
+	virtual UEdGraphNode* PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode = true) override;
+	
+};
+
 UCLASS()
 class DIALOGEDITOR_API UDialogGraphSchema : public UEdGraphSchema
 {
@@ -28,5 +41,5 @@ class DIALOGEDITOR_API UDialogGraphSchema : public UEdGraphSchema
 public:
 	virtual void GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const override;
 	virtual const FPinConnectionResponse CanCreateConnection(const UEdGraphPin* A, const UEdGraphPin* B) const override;
-	
+	virtual void CreateDefaultNodesForGraph(UEdGraph& Graph) const override;
 };
