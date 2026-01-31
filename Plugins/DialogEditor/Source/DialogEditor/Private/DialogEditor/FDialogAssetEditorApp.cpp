@@ -33,7 +33,24 @@ void FDialogAssetEditorApp::InitEditor(const EToolkitMode::Type mode,
 		UEdGraph::StaticClass(),
 		UDialogGraphSchema::StaticClass()
 		);
-	WorkingDialogAsset->SetPreSaveCallback([this]() { OnWorkingAssetPreSave(); });
+	
+	// TODO: currently we are using pre save for triggering the save
+	// but our save relies on the editor to be alive, we simply captured
+	// a weakptr here and give user a message, so only saving when the editor
+	// is alive is supported.
+	TWeakPtr<FDialogAssetEditorApp> WeakSelf = SharedThis(this);
+	WorkingDialogAsset->SetPreSaveCallback([WeakSelf]()
+	{
+		if (TSharedPtr<FDialogAssetEditorApp> SharedSelf = WeakSelf.Pin())
+		{
+			SharedSelf->OnWorkingAssetPreSave();
+		}else
+		{
+			UE_LOG(LogDialogAssetEditorAppSub, Error,
+			   TEXT("DialogAsset won't save properly without the editor open. Open the dialog asset and save from that editor."));	
+		}
+	});
+	
 	TArray<UObject*> ObjectsToEdit;
 	ObjectsToEdit.Add(ObjectToEdit);
 	InitAssetEditor(
@@ -122,6 +139,7 @@ void FDialogAssetEditorApp::UpdateWorkingAssetFromGraph()
 			// recording pin informations
 			RuntimePin->PinId = GraphPin->PinId;
 			RuntimePin->PinName = GraphPin->PinName;
+			RuntimePin->ParentNode = RuntimeNode;
 			
 			// record all connections
 			if (GraphPin->HasAnyConnections() && GraphPin->Direction == EGPD_Output)

@@ -20,4 +20,6 @@ public:
 	FGuid PinId;
 	UPROPERTY()
 	UDialogGraphPinRuntime* Connection = nullptr;
+	UPROPERTY()
+	UDialogGraphNodeRuntime* ParentNode = nullptr;
 };
