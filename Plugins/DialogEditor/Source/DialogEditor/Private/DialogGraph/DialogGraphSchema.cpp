@@ -4,7 +4,8 @@
 #include "DialogGraph/DialogGraphSchema.h"
 
 #include "DialogNode/DialogGraphNode.h"
-#include "DialogNodeInfo.h"
+#include "RuntimeNode/NodeInfo/DialogNodeInfoBase.h"
+#include "RuntimeNode/NodeInfo/DialogNodeInfo.h"
 #include "DialogNode/DialogGraphStartNode.h"
 
 
@@ -21,7 +22,10 @@ UEdGraphNode* FNewNodeAction::PerformAction(class UEdGraph* ParentGraph, UEdGrap
 	// create default response pin
 	FString DefaultResponse = FString("Continue");
 	ResultNode->CreateDialogPin(EGPD_Output, *DefaultResponse);
-	ResultNode->GetNodeInfo()->DialogResponses.Add(FText::FromString(DefaultResponse));
+	if (UDialogNodeInfo* NodeInfo = Cast<UDialogNodeInfo>(ResultNode->GetNodeInfo()))
+	{
+		NodeInfo->DialogResponses.Add(FText::FromString(DefaultResponse));
+	}
 	ParentGraph->AddNode(ResultNode, true, true);
 	
 	if (FromPin)
@@ -39,7 +43,7 @@ UEdGraphNode* FNewStartNodeAction::PerformAction(class UEdGraph* ParentGraph, UE
 	ResultNode->CreateNewGuid();
 	ResultNode->NodePosX = Location.X;
 	ResultNode->NodePosY = Location.Y;
-	FString DefaultResponse = FString("Continue");
+	ResultNode->SetNodeInfo(NewObject<UDialogNodeInfoBase>(ResultNode));
 	ResultNode->CreateDialogPin(EGPD_Output, FName("Start"));
 	ParentGraph->AddNode(ResultNode, true, true);
 	
@@ -83,8 +87,10 @@ void UDialogGraphSchema::CreateDefaultNodesForGraph(UEdGraph& Graph) const
 	StartNode->CreateNewGuid();
 	StartNode->NodePosX = 0;
 	StartNode->NodePosY = 0;
+	StartNode->SetNodeInfo(NewObject<UDialogNodeInfoBase>(StartNode));
 	StartNode->CreateDialogPin(EGPD_Output, TEXT("Start"));
 	Graph.AddNode(StartNode, true, true);
 	Graph.Modify();
 }
+
 

@@ -13,4 +13,7 @@ UCLASS()
 class DIALOGEDITORRUNTIME_API UDialogNodeInfoBase : public UObject
 {
 	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+	FText Message;
 };

@@ -44,7 +44,7 @@ protected:
 private:
 	class UDialogAsset* WorkingDialogAsset = nullptr;
 	class UEdGraph* WorkingDialogGraph = nullptr;
-	class UDialogGraphNode* SelectedNode = nullptr;
+	class UDialogGraphNodeBase* SelectedNode = nullptr;
 	FDelegateHandle GraphChangedDelegateHandle;
 	
 	TSharedPtr<SGraphEditor> WorkingGraphEditor = nullptr;

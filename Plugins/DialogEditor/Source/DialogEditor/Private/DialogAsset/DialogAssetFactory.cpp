@@ -3,7 +3,7 @@
 
 #include "DialogAsset/DialogAssetFactory.h"
 
-#include "DialogAsset.h"
+#include "Asset/DialogAsset.h"
 
 UDialogAssetFactory::UDialogAssetFactory(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
@@ -22,4 +22,5 @@ bool UDialogAssetFactory::CanCreateNew() const
 {
 	return true;
 }
+
 

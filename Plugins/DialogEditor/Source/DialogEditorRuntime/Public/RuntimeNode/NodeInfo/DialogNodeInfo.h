@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RuntimeNode/NodeInfo/DialogNodeInfoBase.h"
 #include "UObject/Object.h"
 #include "DialogNodeInfo.generated.h"
 
@@ -10,7 +11,7 @@
  * 
  */
 UCLASS()
-class DIALOGEDITORRUNTIME_API UDialogNodeInfo : public UObject
+class DIALOGEDITORRUNTIME_API UDialogNodeInfo : public UDialogNodeInfoBase
 {
 	GENERATED_BODY()
 public:
@@ -23,3 +24,4 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<FText> DialogResponses;
 };
+

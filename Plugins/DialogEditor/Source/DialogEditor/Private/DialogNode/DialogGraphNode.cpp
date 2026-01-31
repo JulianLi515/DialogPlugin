@@ -4,7 +4,7 @@
 #include "DialogNode/DialogGraphNode.h"
 
 #include "DialogEditor.h"
-#include "DialogNodeInfo.h"
+#include "RuntimeNode/NodeInfo/DialogNodeInfo.h"
 #include "DialogGraph/SDialogGraphPin.h"
 
 namespace
@@ -73,18 +73,18 @@ namespace
 FText UDialogGraphNode::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
 	// return Super::GetNodeTitle(TitleType);
-	if (NodeInfo)
+	if (UDialogNodeInfo* DialogNodeInfo = Cast<UDialogNodeInfo>(this->NodeInfo))
 	{
-		if (NodeInfo->Title.IsEmpty())
+		if (DialogNodeInfo->Title.IsEmpty())
 		{
-			FString DialogText = NodeInfo->DialogText.ToString();
+			FString DialogText = DialogNodeInfo->DialogText.ToString();
 			if (DialogText.Len()>15)
 			{
 				DialogText = DialogText.Left(15) + FString("...");
 			}
 			return FText::FromString(DialogText);
 		}
-		return NodeInfo->Title;
+		return DialogNodeInfo->Title;
 	}
 	return FText::FromString("DialogNode");
 }
@@ -116,7 +116,10 @@ void UDialogGraphNode::GetNodeContextMenuActions(class UToolMenu* Menu,
 			FUIAction(FExecuteAction::CreateLambda(
 				[MutableThis]()
 					{
-						MutableThis->NodeInfo->DialogResponses.Add(FText::FromString("New Response"));
+						if (UDialogNodeInfo* NodeInfo = Cast<UDialogNodeInfo>(MutableThis->NodeInfo))
+						{
+							NodeInfo->DialogResponses.Add(FText::FromString("New Response"));
+						}
 						MutableThis->SyncPinWithResponses();
 						MutableThis->GetGraph()->NotifyGraphChanged();
 						MutableThis->GetGraph()->Modify();
@@ -137,8 +140,7 @@ void UDialogGraphNode::GetNodeContextMenuActions(class UToolMenu* Menu,
 						UEdGraphPin* LastPin = MutableThis->Pins[MutableThis->Pins.Num() - 1];
 						if (LastPin->Direction != EGPD_Input)
 						{
-							UDialogNodeInfo* NodeInfo = MutableThis->NodeInfo;
-							if (NodeInfo)
+							if (UDialogNodeInfo* NodeInfo = Cast<UDialogNodeInfo>(MutableThis->NodeInfo))
 							{
 								if (NodeInfo->DialogResponses.Num() > 0)
 								{
@@ -189,7 +191,9 @@ void UDialogGraphNode::SyncPinWithResponses()
 	if (!NodeInfo) return;
 	// we will assume we only have one input pin and that is the first pin
 	int NumOutPin = Pins.Num() - 1;
-	int NumResponses = NodeInfo->DialogResponses.Num();
+	UDialogNodeInfo* DialogNodeInf = Cast<UDialogNodeInfo>(NodeInfo);
+	if (!DialogNodeInf) return;
+	int NumResponses = DialogNodeInf->DialogResponses.Num();
 	// adjust pin counts
 	while (NumOutPin < NumResponses)
 	{
@@ -204,12 +208,13 @@ void UDialogGraphNode::SyncPinWithResponses()
 	
 	// sync pin names
 	int index = 1;
-	for (auto Text : NodeInfo->DialogResponses)
+	for (auto Text : DialogNodeInf->DialogResponses)
 	{
 		GetPinAt(index)->PinName = FName(Text.ToString());
 		++index;
 	}
 	
 }
+
 
 

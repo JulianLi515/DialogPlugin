@@ -6,6 +6,7 @@
 #include "EdGraph/EdGraphNode.h"
 #include "DialogGraphNodeBase.generated.h"
 
+class UDialogNodeInfoBase;
 class UDialogNodeInfo;
 /**
  * 
@@ -16,9 +17,9 @@ class DIALOGEDITOR_API UDialogGraphNodeBase : public UEdGraphNode
 	GENERATED_BODY()
 public:
 	virtual UEdGraphPin* CreateDialogPin(EEdGraphPinDirection InDirection, FName InName) {return nullptr;}
-	void SetNodeInfo(UDialogNodeInfo* InNodeInfo);
-	UDialogNodeInfo* GetNodeInfo() const {return NodeInfo;}
+	void SetNodeInfo(UDialogNodeInfoBase* InNodeInfo);
+	UDialogNodeInfoBase* GetNodeInfo() const {return NodeInfo;}
 protected:
 	UPROPERTY()
-	UDialogNodeInfo* NodeInfo;
+	UDialogNodeInfoBase* NodeInfo;
 };

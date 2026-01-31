@@ -3,7 +3,7 @@
 
 #include "DialogNode/DialogGraphNodeBase.h"
 
-void UDialogGraphNodeBase::SetNodeInfo(UDialogNodeInfo* InNodeInfo)
+void UDialogGraphNodeBase::SetNodeInfo(UDialogNodeInfoBase* InNodeInfo)
 {
 	NodeInfo = InNodeInfo;
 }

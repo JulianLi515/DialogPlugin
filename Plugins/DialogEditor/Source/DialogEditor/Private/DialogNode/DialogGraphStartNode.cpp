@@ -20,6 +20,12 @@ bool UDialogGraphStartNode::CanUserDeleteNode() const
 	return true;
 }
 
+void UDialogGraphStartNode::GetNodeContextMenuActions(class UToolMenu* Menu,
+	class UGraphNodeContextMenuContext* Context) const
+{
+	Super::GetNodeContextMenuActions(Menu, Context);
+}
+
 UEdGraphPin* UDialogGraphStartNode::CreateDialogPin(EEdGraphPinDirection InDirection, FName InName)
 {
 	FName Category = TEXT("Outputs");

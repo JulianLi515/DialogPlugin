@@ -2,7 +2,7 @@
 
 
 #include "DialogAsset/DialogAssetAction.h"
-#include "DialogAsset.h"
+#include "Asset/DialogAsset.h"
 #include "DialogEditor/FDialogAssetEditorApp.h"
 #define LOCTEXT_NAMESPACE "DialogAssetAction"
 
@@ -49,4 +49,5 @@ uint32 FDialogAssetAction::GetCategories()
 }
 
 #undef LOCTEXT_NAMESPACE
+
 

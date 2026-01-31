@@ -1,13 +1,13 @@
 #include "DialogEditor/FDialogAssetEditorApp.h"
 
-#include "DialogAsset.h"
+#include "Asset/DialogAsset.h"
 #include "DialogEditor/DialogAssetAppMode.h"
 #include "DialogNode/DialogGraphNode.h"
-#include "DialogGraphNodeRuntime.h"
-#include "DialogGraphPinRuntime.h"
-#include "DialogGraphRuntime.h"
+#include "RuntimeNode/DialogGraphNodeRuntime.h"
+#include "RuntimeGraph/DialogGraphPinRuntime.h"
+#include "RuntimeGraph/DialogGraphRuntime.h"
 #include "DialogGraph/DialogGraphSchema.h"
-#include "DialogNodeInfo.h"
+#include "RuntimeNode/NodeInfo/DialogNodeInfo.h"
 #include "DialogNode/DialogGraphStartNode.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 
@@ -64,7 +64,7 @@ void FDialogAssetEditorApp::OnGraphSelectionChanged(const FGraphPanelSelectionSe
 {
 	for (UObject* Obj: NewSelection)
 	{
-		if (UDialogGraphNode* Node = Cast<UDialogGraphNode>(Obj))
+		if (UDialogGraphNodeBase* Node = Cast<UDialogGraphNodeBase>(Obj))
 		{
 			SelectedNode = Node;
 			SelectedNodeDetailsView->SetObject(Node->GetNodeInfo());
@@ -85,9 +85,9 @@ void FDialogAssetEditorApp::OnNodeDetailsUpdated(const FPropertyChangedEvent& Pr
 {
 	if (WorkingGraphEditor)
 	{
-		if (SelectedNode)
+		if (UDialogGraphNode* SelectedGraphNode = Cast<UDialogGraphNode>(SelectedNode))
 		{
-			SelectedNode->SyncPinWithResponses();
+			SelectedGraphNode->SyncPinWithResponses();
 		}
 		WorkingGraphEditor->NotifyGraphChanged();
 	}
@@ -190,12 +190,9 @@ void FDialogAssetEditorApp::UpdateEditorGraphFromWorkingAsset()
 		GraphNode->CreateNewGuid();
 		GraphNode->NodePosX = RuntimeNode->Position.X;
 		GraphNode->NodePosY = RuntimeNode->Position.Y;
-		if (UDialogNodeInfo* NodeInfo = RuntimeNode->NodeInfo)
+		if (UDialogNodeInfoBase* NodeInfo = RuntimeNode->NodeInfo)
 		{
 			GraphNode->SetNodeInfo(DuplicateObject(NodeInfo, RuntimeNode));
-		}else if (RuntimeNode->NodeType != EDialogNodeType::Start)
-		{
-			GraphNode->SetNodeInfo(NewObject<UDialogNodeInfo>(RuntimeNode));
 		}
 		if (UDialogGraphPinRuntime* InputPin = RuntimeNode->InputPin){
 			UEdGraphPin* GraphPin = GraphNode->CreateDialogPin(EGPD_Input, InputPin->PinName);
@@ -231,4 +228,5 @@ void FDialogAssetEditorApp::UpdateEditorGraphFromWorkingAsset()
 	}
 	
 }
+
 

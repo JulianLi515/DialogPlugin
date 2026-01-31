@@ -1,6 +1,6 @@
 #include "DialogAsset/DialogAssetPropertiesTabFactory.h"
 #include "DialogEditor/FDialogAssetEditorApp.h"
-#include "DialogAsset.h"
+#include "Asset/DialogAsset.h"
 
 #define LOCTEXT_NAMESPACE "DialogEditorModule"
 
@@ -63,4 +63,5 @@ FText FDialogAssetPropertiesTabFactory::GetTabToolTipText(const FWorkflowTabSpaw
 }
 
 #undef LOCTEXT_NAMESPACE
+
 

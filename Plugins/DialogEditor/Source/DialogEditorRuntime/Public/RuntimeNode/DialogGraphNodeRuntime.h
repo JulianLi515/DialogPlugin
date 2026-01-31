@@ -6,7 +6,7 @@
 #include "UObject/Object.h"
 #include "DialogGraphNodeRuntime.generated.h"
 
-class UDialogNodeInfo;
+class UDialogNodeInfoBase;
 class UDialogGraphPinRuntime;
 /**
  * 
@@ -15,6 +15,7 @@ class UDialogGraphPinRuntime;
 UENUM()
 enum class EDialogNodeType
 {
+	Unknown,
 	Start,
 	Dialog,
 	End
@@ -37,5 +38,5 @@ public:
 	FVector2D Position;
 	
 	UPROPERTY()
-	UDialogNodeInfo* NodeInfo = nullptr;
+	UDialogNodeInfoBase* NodeInfo = nullptr;
 };
