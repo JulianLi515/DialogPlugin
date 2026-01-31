@@ -3,6 +3,7 @@
 
 #include "DialogGraph/DialogGraphSchema.h"
 
+#include "DialogNode/DialogGraphEndNode.h"
 #include "DialogNode/DialogGraphNode.h"
 #include "RuntimeNode/NodeInfo/DialogNodeInfoBase.h"
 #include "RuntimeNode/NodeInfo/DialogNodeInfo.h"
@@ -12,20 +13,16 @@
 UEdGraphNode* FNewNodeAction::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location,
                                             bool bSelectNewNode)
 {
-	UDialogGraphNode* ResultNode = NewObject<UDialogGraphNode>(ParentGraph);
+	UDialogGraphNodeBase* ResultNode = NewObject<UDialogGraphNodeBase>(ParentGraph, ClassTemplate);
 	ResultNode->CreateNewGuid();
 	ResultNode->NodePosX = Location.X;
 	ResultNode->NodePosY = Location.Y;
-	ResultNode->SetNodeInfo(NewObject<UDialogNodeInfo>(ResultNode));
+	ResultNode->InitNodeInfo(ResultNode);
 	// create default input pin
-	UEdGraphPin* InputPin = ResultNode->CreateDialogPin(EGPD_Input, TEXT("In"));
-	// create default response pin
-	FString DefaultResponse = FString("Continue");
-	ResultNode->CreateDialogPin(EGPD_Output, *DefaultResponse);
-	if (UDialogNodeInfo* NodeInfo = Cast<UDialogNodeInfo>(ResultNode->GetNodeInfo()))
-	{
-		NodeInfo->DialogResponses.Add(FText::FromString(DefaultResponse));
-	}
+	UEdGraphPin* InputPin = ResultNode->CreateDefaultInputPin();
+	// create default response pi
+	ResultNode->CreateDefaultOutputPins();
+	
 	ParentGraph->AddNode(ResultNode, true, true);
 	
 	if (FromPin)
@@ -36,34 +33,22 @@ UEdGraphNode* FNewNodeAction::PerformAction(class UEdGraph* ParentGraph, UEdGrap
 	
 }
 
-UEdGraphNode* FNewStartNodeAction::PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin,
-	const FVector2D Location, bool bSelectNewNode)
-{
-	UDialogGraphStartNode* ResultNode = NewObject<UDialogGraphStartNode>(ParentGraph);
-	ResultNode->CreateNewGuid();
-	ResultNode->NodePosX = Location.X;
-	ResultNode->NodePosY = Location.Y;
-	ResultNode->SetNodeInfo(NewObject<UDialogNodeInfoBase>(ResultNode));
-	ResultNode->CreateDialogPin(EGPD_Output, FName("Start"));
-	ParentGraph->AddNode(ResultNode, true, true);
-	
-	return ResultNode;
-}
-
 void UDialogGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const
 {
-	TSharedPtr<FNewNodeAction> NewNodeAction = MakeShareable(new FNewNodeAction(
+	TSharedPtr<FNewNodeAction> NewDialogNodeAction = MakeShareable(new FNewNodeAction(
+		UDialogGraphNode::StaticClass(),
 		FText::FromString("Nodes"),
 		FText::FromString("New node"),
 		FText::FromString("Makes a new node"),
 		0));
-	TSharedPtr<FNewStartNodeAction> NewStartNodeAction = MakeShareable(new FNewStartNodeAction(
-		FText::FromString("Start Node"),
-		FText::FromString("New Start Node"),
-		FText::FromString("Makes a new Start Node"),
+	TSharedPtr<FNewNodeAction> NewEndNodeAction = MakeShareable(new FNewNodeAction(
+		UDialogGraphEndNode::StaticClass(),
+		FText::FromString("Nodes"),
+		FText::FromString("New end node"),
+		FText::FromString("Makes a new end node"),
 		0));
-	ContextMenuBuilder.AddAction(NewNodeAction);
-	ContextMenuBuilder.AddAction(NewStartNodeAction);
+	ContextMenuBuilder.AddAction(NewDialogNodeAction);
+	ContextMenuBuilder.AddAction(NewEndNodeAction);
 }
 
 const FPinConnectionResponse UDialogGraphSchema::CanCreateConnection(const UEdGraphPin* A, const UEdGraphPin* B) const
@@ -77,7 +62,15 @@ const FPinConnectionResponse UDialogGraphSchema::CanCreateConnection(const UEdGr
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, "Pin already connected");
 	}
-	return FPinConnectionResponse(CONNECT_RESPONSE_BREAK_OTHERS_AB, "");
+	if (A->Direction == EGPD_Output && B->Direction == EGPD_Input)
+	{
+		return FPinConnectionResponse(CONNECT_RESPONSE_BREAK_OTHERS_A, "Connect to next action");
+	}
+	if (A->Direction == EGPD_Input && B->Direction == EGPD_Output)
+	{
+		return FPinConnectionResponse(CONNECT_RESPONSE_BREAK_OTHERS_B, "Connect a response");
+	}
+	return FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, "Invalid connection");
 }
 
 void UDialogGraphSchema::CreateDefaultNodesForGraph(UEdGraph& Graph) const

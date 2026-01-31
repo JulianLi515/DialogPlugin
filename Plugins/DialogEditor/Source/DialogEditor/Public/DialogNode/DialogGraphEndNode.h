@@ -3,35 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DialogNode/DialogGraphNodeBase.h"
-#include "EdGraph/EdGraphNode.h"
-#include "DialogGraphNode.generated.h"
+#include "DialogGraphNodeBase.h"
+#include "DialogGraphEndNode.generated.h"
 
-class UDialogNodeInfo;
 /**
  * 
  */
 UCLASS()
-class DIALOGEDITOR_API UDialogGraphNode : public UDialogGraphNodeBase
+class DIALOGEDITOR_API UDialogGraphEndNode : public UDialogGraphNodeBase
 {
 	GENERATED_BODY()
 public:
-	// UEdGraph 
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
-	virtual FLinearColor GetNodeTitleColor() const override;
-	virtual bool CanUserDeleteNode() const override;
+	virtual FLinearColor GetNodeTitleColor() const override {return FLinearColor::Blue;}
+	virtual bool CanUserDeleteNode() const override {return true;}
 	virtual void GetNodeContextMenuActions(class UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const override;
 	
 	// DialogGraphNodeBase
 	virtual UEdGraphPin* CreateDialogPin(EEdGraphPinDirection InDirection, FName InName) override;
 	virtual void InitNodeInfo(UObject* Outer) override;
 	virtual void OnPropertiesChanged() override;
-	virtual EDialogNodeType GetNodeType() const override {return EDialogNodeType::Dialog;}
+	virtual EDialogNodeType GetNodeType() const override {return EDialogNodeType::End;}
 	virtual UEdGraphPin* CreateDefaultInputPin() override;
-	virtual void CreateDefaultOutputPins() override;
-	void SyncPinWithResponses();
-
-
-
 };
-

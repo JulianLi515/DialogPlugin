@@ -24,3 +24,16 @@ FSlateColor SDialogGraphStartPin::GetPinColor() const
 	return FSlateColor(FLinearColor(0.8, 0.1, 0.1));
 }
 
+const FName SDialogGraphEndPin::DialogGraphPinSubCategory("DialogGraphEndPin");
+
+FSlateColor SDialogGraphEndPin::GetPinColor() const
+{
+	// return SGraphPin::GetPinColor();
+	return FSlateColor(FLinearColor(0.1, 0.1, 0.8));
+}
+
+void SDialogGraphEndPin::Construct(const FArguments& InArgs, UEdGraphPin* InGraphPinObj)
+{
+	SGraphPin::Construct(SGraphPin::FArguments(), InGraphPinObj);
+}
+

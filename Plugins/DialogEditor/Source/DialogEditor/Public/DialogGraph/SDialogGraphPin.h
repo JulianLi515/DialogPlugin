@@ -29,6 +29,17 @@ protected:
 	
 };
 
+class SDialogGraphEndPin : public SGraphPin
+{
+	public:
+		SLATE_BEGIN_ARGS(SDialogGraphEndPin){}
+		SLATE_END_ARGS()
+		void Construct(const FArguments& InArgs, UEdGraphPin* InGraphPinObj);
+		static const FName DialogGraphPinSubCategory;
+	protected:
+		virtual FSlateColor GetPinColor() const override;
+};
+
 struct FDialogGraphPinFactory : public FGraphPanelPinFactory
 {
 public:
@@ -41,6 +52,9 @@ public:
 		}else if (Pin->PinType.PinSubCategory == SDialogGraphStartPin::DialogGraphPinSubCategory)
 		{
 			return SNew(SDialogGraphStartPin, Pin);
+		}else if (Pin->PinType.PinSubCategory == SDialogGraphEndPin::DialogGraphPinSubCategory)
+		{
+			return SNew(SDialogGraphEndPin, Pin);
 		}
 		return nullptr;
 	}

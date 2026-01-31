@@ -17,7 +17,7 @@ FLinearColor UDialogGraphStartNode::GetNodeTitleColor() const
 
 bool UDialogGraphStartNode::CanUserDeleteNode() const
 {
-	return true;
+	return false;
 }
 
 void UDialogGraphStartNode::GetNodeContextMenuActions(class UToolMenu* Menu,
@@ -35,4 +35,9 @@ UEdGraphPin* UDialogGraphStartNode::CreateDialogPin(EEdGraphPinDirection InDirec
 	NewPin->PinType.PinSubCategory = SubCategory;
 	return NewPin;
 	
+}
+
+void UDialogGraphStartNode::CreateDefaultOutputPins()
+{
+	CreateDialogPin(EGPD_Output, TEXT("Out"));	
 }

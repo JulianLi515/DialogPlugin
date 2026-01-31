@@ -15,24 +15,14 @@ struct FNewNodeAction :public FEdGraphSchemaAction
 	GENERATED_BODY()
 public:
 	FNewNodeAction() {};
-	FNewNodeAction(FText InNodeCategory, FText InMenuDesc, FText InToolTip, const int32 InGrouping)
-		: FEdGraphSchemaAction(InNodeCategory, InMenuDesc, InToolTip, InGrouping)	
+	FNewNodeAction(UClass* InClassTemplate, FText InNodeCategory, FText InMenuDesc, FText InToolTip, const int32 InGrouping)
+		: FEdGraphSchemaAction(InNodeCategory, InMenuDesc, InToolTip, InGrouping), ClassTemplate(InClassTemplate)	
 	{}
 	virtual UEdGraphNode* PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode = true) override;
+protected:
+	UClass* ClassTemplate;
 };
 
-USTRUCT()
-struct FNewStartNodeAction :public FEdGraphSchemaAction
-{
-	GENERATED_BODY()
-public:
-	FNewStartNodeAction() {};
-	FNewStartNodeAction(FText InNodeCategory, FText InMenuDesc, FText InToolTip, const int32 InGrouping)
-		: FEdGraphSchemaAction(InNodeCategory, InMenuDesc, InToolTip, InGrouping)	
-	{}
-	virtual UEdGraphNode* PerformAction(class UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode = true) override;
-	
-};
 
 UCLASS()
 class DIALOGEDITOR_API UDialogGraphSchema : public UEdGraphSchema

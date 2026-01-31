@@ -73,7 +73,7 @@ namespace
 FText UDialogGraphNode::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
 	// return Super::GetNodeTitle(TitleType);
-	if (UDialogNodeInfo* DialogNodeInfo = Cast<UDialogNodeInfo>(this->NodeInfo))
+	if (UDialogNodeInfo* DialogNodeInfo = GetNodeInfo<UDialogNodeInfo>())
 	{
 		if (DialogNodeInfo->Title.IsEmpty())
 		{
@@ -101,8 +101,8 @@ bool UDialogGraphNode::CanUserDeleteNode() const
 	return true;
 }
 
-void UDialogGraphNode::GetNodeContextMenuActions(class UToolMenu* Menu,
-	class UGraphNodeContextMenuContext* Context) const
+void UDialogGraphNode::GetNodeContextMenuActions(UToolMenu* Menu,
+	UGraphNodeContextMenuContext* Context) const
 {
 	// Super::GetNodeContextMenuActions(Menu, Context);
 	FToolMenuSection& Section = Menu->AddSection(TEXT("SectionName"), FText::FromString("Dialog Node Actions"));
@@ -116,7 +116,7 @@ void UDialogGraphNode::GetNodeContextMenuActions(class UToolMenu* Menu,
 			FUIAction(FExecuteAction::CreateLambda(
 				[MutableThis]()
 					{
-						if (UDialogNodeInfo* NodeInfo = Cast<UDialogNodeInfo>(MutableThis->NodeInfo))
+						if (UDialogNodeInfo* NodeInfo = MutableThis->GetNodeInfo<UDialogNodeInfo>())
 						{
 							NodeInfo->DialogResponses.Add(FText::FromString("New Response"));
 						}
@@ -140,7 +140,7 @@ void UDialogGraphNode::GetNodeContextMenuActions(class UToolMenu* Menu,
 						UEdGraphPin* LastPin = MutableThis->Pins[MutableThis->Pins.Num() - 1];
 						if (LastPin->Direction != EGPD_Input)
 						{
-							if (UDialogNodeInfo* NodeInfo = Cast<UDialogNodeInfo>(MutableThis->NodeInfo))
+							if (UDialogNodeInfo* NodeInfo = MutableThis->GetNodeInfo<UDialogNodeInfo>())
 							{
 								if (NodeInfo->DialogResponses.Num() > 0)
 								{
@@ -184,6 +184,34 @@ UEdGraphPin* UDialogGraphNode::CreateDialogPin(EEdGraphPinDirection InDirection,
 	NewPin->PinType.PinSubCategory = SubCategory;
 	return NewPin;
 	
+}
+
+void UDialogGraphNode::InitNodeInfo(UObject* Outer)
+{
+	// Super::InitNodeInfo(Outer);
+	NodeInfo = NewObject<UDialogNodeInfo>(Outer);
+}
+
+void UDialogGraphNode::OnPropertiesChanged()
+{
+	// Super::OnPropertiesChanged();
+	SyncPinWithResponses();
+	Modify();
+}
+
+UEdGraphPin* UDialogGraphNode::CreateDefaultInputPin()
+{
+	return CreateDialogPin(EGPD_Input, TEXT("In"));
+}
+
+void UDialogGraphNode::CreateDefaultOutputPins()
+{
+	FString DefaultResponse = FString("Continue");
+	CreateDialogPin(EGPD_Output, *DefaultResponse);
+	if (UDialogNodeInfo* DialogNodeInfo = GetNodeInfo<UDialogNodeInfo>())
+	{
+		DialogNodeInfo->DialogResponses.Add(FText::FromString(DefaultResponse));
+	}
 }
 
 void UDialogGraphNode::SyncPinWithResponses()

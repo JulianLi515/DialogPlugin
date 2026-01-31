@@ -20,4 +20,6 @@ public:
 	virtual void GetNodeContextMenuActions(class UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const override;
 	
 	virtual UEdGraphPin* CreateDialogPin(EEdGraphPinDirection InDirection, FName InName) override;
+	virtual void CreateDefaultOutputPins() override;
+	virtual EDialogNodeType GetNodeType() const override {return EDialogNodeType::Start;}
 };

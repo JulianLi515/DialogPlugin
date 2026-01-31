@@ -7,6 +7,7 @@
 #include "RuntimeGraph/DialogGraphPinRuntime.h"
 #include "RuntimeGraph/DialogGraphRuntime.h"
 #include "DialogGraph/DialogGraphSchema.h"
+#include "DialogNode/DialogGraphEndNode.h"
 #include "RuntimeNode/NodeInfo/DialogNodeInfo.h"
 #include "DialogNode/DialogGraphStartNode.h"
 #include "Kismet2/BlueprintEditorUtils.h"
@@ -85,9 +86,9 @@ void FDialogAssetEditorApp::OnNodeDetailsUpdated(const FPropertyChangedEvent& Pr
 {
 	if (WorkingGraphEditor)
 	{
-		if (UDialogGraphNode* SelectedGraphNode = Cast<UDialogGraphNode>(SelectedNode))
+		if (SelectedNode)
 		{
-			SelectedGraphNode->SyncPinWithResponses();
+			SelectedNode->OnPropertiesChanged();
 		}
 		WorkingGraphEditor->NotifyGraphChanged();
 	}
@@ -139,18 +140,12 @@ void FDialogAssetEditorApp::UpdateWorkingAssetFromGraph()
 				RuntimeNode->OutputPins.Add(RuntimePin);
 			}
 		}
-		if (GraphNode->IsA<UDialogGraphNode>())
-		{
-			UDialogGraphNode* DialogNode = Cast<UDialogGraphNode>(GraphNode);
-			RuntimeNode->NodeInfo = DialogNode->GetNodeInfo();
-			RuntimeNode->NodeType = EDialogNodeType::Dialog;
-			
-		}else if (GraphNode->IsA<UDialogGraphStartNode>())
-		{
-			UDialogGraphStartNode* DialogStartNode = Cast<UDialogGraphStartNode>(GraphNode);
-			RuntimeNode->NodeInfo = DialogStartNode->GetNodeInfo();
-			RuntimeNode->NodeType = EDialogNodeType::Start;
-		}
+		// set node type and node info
+		UDialogGraphNodeBase* GraphNodeBase = Cast<UDialogGraphNodeBase>(GraphNode);
+		check(GraphNodeBase);
+		RuntimeNode->NodeType = GraphNodeBase->GetNodeType();
+		RuntimeNode->NodeInfo = DuplicateObject(GraphNodeBase->GetNodeInfo(), RuntimeNode);
+		
 		RuntimeGraph->DialogNodes.Add(RuntimeNode);
 	}
 	
@@ -182,6 +177,9 @@ void FDialogAssetEditorApp::UpdateEditorGraphFromWorkingAsset()
 		}else if (RuntimeNode->NodeType == EDialogNodeType::Dialog)
 		{
 			GraphNode = NewObject<UDialogGraphNode>(WorkingDialogGraph);
+		}else if (RuntimeNode->NodeType == EDialogNodeType::End)
+		{
+			GraphNode = NewObject<UDialogGraphEndNode>(WorkingDialogGraph);
 		}else
 		{
 			UE_LOG(LogDialogAssetEditorAppSub, Error, TEXT("Unknown node type %d"), RuntimeNode->NodeType);
@@ -193,6 +191,9 @@ void FDialogAssetEditorApp::UpdateEditorGraphFromWorkingAsset()
 		if (UDialogNodeInfoBase* NodeInfo = RuntimeNode->NodeInfo)
 		{
 			GraphNode->SetNodeInfo(DuplicateObject(NodeInfo, RuntimeNode));
+		}else
+		{
+			GraphNode->InitNodeInfo(GraphNode);
 		}
 		if (UDialogGraphPinRuntime* InputPin = RuntimeNode->InputPin){
 			UEdGraphPin* GraphPin = GraphNode->CreateDialogPin(EGPD_Input, InputPin->PinName);
